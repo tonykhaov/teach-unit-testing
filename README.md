@@ -15,7 +15,7 @@ Hello this is my workshop to teach you how to learn unit testing (JS & React)
 <details>
 <summary>Lesson</summary>
 
-```typescript
+```tsx
 // add() is the function we want to test
 function add(a: number, b: number) {
   return a + b
@@ -63,7 +63,7 @@ test('should not return the substraction of the two numbers provided', () => {
 
 1. Substraction function
 
-```typescript
+```tsx
 // UPDATE ME
 function substract() {}
 
@@ -78,7 +78,7 @@ test('should not return the addition of the two numbers provided', () => {
 
 2. Multiplication function
 
-```typescript
+```tsx
 // UPDATE ME
 function multiply() {
   return
@@ -106,7 +106,7 @@ test('should not return the addition of the two numbers provided', () => {
 
 1. Arrange your test with .render()
 
-```typescript
+```tsx
 import { render, screen } from '@utils/test/app-test-utils'
 
 test('render HTML elements: a checkbox with a label', () => {
@@ -136,7 +136,7 @@ test('render HTML elements: a checkbox with a label', () => {
 
 2. Get elements with screen.getBy() and make assertions on them with .toBeInTheDocument()
 
-```typescript
+```tsx
 import { render, screen } from '@utils/test/app-test-utils'
 
 function Header() {
@@ -201,7 +201,7 @@ test('should render <Header/> with the title and the description', () => {
 
 2. Test that I can display any text content inside the `<Button/>` component
 
-```typescript
+```tsx
 import { render, screen } from '@utils/test/app-test-utils'
 
 function Button({ children }: React.PropsWithChildren<React.ReactNode>) {
@@ -221,7 +221,7 @@ test('should return a button and display any text I pass as a children', () => {
 
 4. Test `<List/>` component and with this component I can pass an array as a props that will be displayed individually
 
-```typescript
+```tsx
 import { render, screen } from '@utils/test/app-test-utils'
 import { faker } from '@faker-js/faker'
 
@@ -308,7 +308,7 @@ test('should return a list of items: the exact number of items and their names s
 <details>
 <summary>Lesson</summary>
 
-```typescript
+```tsx
 import { render, screen } from '@utils/test/app-test-utils'
 
 type CheckboxProps = {
