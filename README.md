@@ -302,3 +302,81 @@ test('should return a list of items: the exact number of items and their names s
 - As you may have noticed in the 4th exercise, I use Faker.js to generate random data. I explain it in the exercise but you can check out [Faker.js website](https://fakerjs.dev/) to see the list of all the API the library provides.
 
 </details>
+
+## 3. How to interact with DOM elements (userEvent)
+
+<details>
+<summary>Lesson</summary>
+
+```typescript
+import { render, screen } from '@utils/test/app-test-utils'
+
+type CheckboxProps = {
+  label: string
+}
+
+function Checkbox({ label }: CheckboxProps) {
+  return (
+    <div>
+      <input type="checkbox" id="my-checkbox" />
+      <label htmlFor="my-checkbox">{label}</label>
+    </div>
+  )
+}
+
+test('should render a checkbox with any customised label', () => {
+  // arrange everything to make this test pass
+
+  /*
+  use .getByLabelText() instead of .getByRole('checkbox') because think like a user.
+  The user won't select any random checkbox, it will select the input (checkbox) that has the label text he wants.
+  */
+  expect(checkbox).toBeInTheDocument()
+
+  /* 
+  // userEvent is another testing-library package that allows the test to interract with "DOM" elements
+  // from the userEvent we want to click on something so we pass the element in the method .click()
+  */
+  // UNCOMMENT THE LINE BELOW
+  // userEvent.click(checkbox)
+
+  /*
+  now that we have clicked on the checkbox, we need to make an assertion
+  what do you think it will be?
+  remember to check jest-dom matchers ;)
+  */
+  // expect(checkbox). ???
+})
+
+test('should render a checkbox with a default value of checked but still be able to toggle between checked/unchecked', () => {
+  /*
+  update <Checkbox/> to allow a default value to be passed so that I can start the checkbox as checked
+  and also allow the user to toggle between checked/unchecked
+  */
+  // write the test
+})
+```
+
+</details>
+
+<details>
+<summary>Exercises</summary>
+
+1. Create an `<Input/>` component that will return these 2 elements: `<input type="text"/>` and `<label>Email address</label>`. Test that you can write any email (use faker) inside the input and make an assertion on it. Hint: use `.getByLabelText()` instead of .getByRole(”textbox”) because think of it as a user: you want to get the input that has the label text “Email address”.
+
+- Extra: I can now pass a defaultValue to `<Input/>` so cover this case.
+- Extra 2: Write a second test and this time this will test that I can choose the type of the input (this will be a type number) and assert that it works: you can type a number and also test that I cannot enter any text in the input.
+
+2. Create a `<Button/>` component, and test that when the user clicks on the button, that the button is focused.
+
+- Extra: Test that when the user hits `tab`, that the button is focused.
+
+3. Create a `<Form/>` component and test it. `<Form/>` will have these elements: input to enter the country, input to enter the age, radios between Mr. and Mrs. and a submit button.
+
+</details>
+
+<details>
+<summary>Go further</summary>
+
+- fireEvent exists but you just need to use userEvent: [https://kentcdodds.com/blog/common-mistakes-with-react-testing-library#not-using-testing-libraryuser-event](https://kentcdodds.com/blog/common-mistakes-with-react-testing-library#not-using-testing-libraryuser-event)
+</details>
