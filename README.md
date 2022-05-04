@@ -5,7 +5,7 @@ Hello this is my workshop to teach you how to learn unit testing (JS & React)
 ### Requirements:
 
 - git clone this project
-- go inside the folder
+- you only need to write your testing code in `learning-workshop.test.tsx`
 - run `npm install`
 - run `npm run test:watch`
 - from now on you can follow the workshop and you’ll just need to copy and paste the code examples in the `learn-unit-testing.test.tsx` file.
@@ -97,9 +97,9 @@ test('should not return the addition of the two numbers provided', () => {
 
 ## 2. How to test a React Component. (render() + .toBeInTheDocument())
 
-- **Jest** is the test runner, what allows the tests to be executed.
+- **Jest**/**Vitest** are test runners, what execute tests. (We will be using vitest but it literally is the same, just that vitest is way faster than jest.)
 
-- **React-testing-library** is a jest library. it allows to render JSX in the "DOM" and querySelect elements in the "DOM" to make assertions with jest.
+- **React-testing-library** is a jest/vitest library. it allows to render JSX in the "DOM" and querySelect elements in the "DOM" to make assertions with them in the test runner.
 
 <details>
 <summary>Lesson</summary>
@@ -162,13 +162,14 @@ test('should render <Header/> with the title and the description', () => {
   // We want the element "Title of the header" to be in the DOM (document)
   expect(title).toBeInTheDocument()
   /*
-  Jest has built-in matchers (comparateurs) but because jest is initially used for testing basic JS functions
-  @testing-library/jest-dom created matchers to work in jest, with the DOM
+  Jest/Vitest has built-in matchers (comparateurs) but because jest/vitest is initially used for testing basic JS functions
+  @testing-library/jest-dom created matchers to work in jest/vitest, with the DOM
   Think of it like this: Jest is the language (like JS) and Testing-Library is the Framework/Library (like React)
   and one custom matcher provided by jest-dom is .toBeInTheDocument()
   you can see all of them here: https://github.com/testing-library/jest-dom/#table-of-contents
   if you want to check at
   https://jestjs.io/fr/docs/using-matchers
+  https://vitest.dev/api/#expect
   *
 
   /*
