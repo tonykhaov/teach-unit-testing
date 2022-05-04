@@ -474,3 +474,173 @@ test('render Player and should only display the right messages when we click on 
 
 - We getBy to get an element that is in the DOM but we only use queryBy to test that an element is not in the DOM [https://kentcdodds.com/blog/common-mistakes-with-react-testing-library#using-query-variants-for-anything-except-checking-for-non-existence](https://kentcdodds.com/blog/common-mistakes-with-react-testing-library#using-query-variants-for-anything-except-checking-for-non-existence)
 </details>
+
+### 5. How to handle async events happening in the DOM (waitFor)
+
+<details>
+<summary>Lesson</summary>
+
+```tsx
+import * as React from 'react'
+import { render, screen, waitFor } from '@testing-library/react'
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+function Loader() {
+  const [loading, setLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    // we simulate a loading state that will then be completed 1 second after the mount
+    sleep(1000).then(() => setLoading(false))
+  }, [])
+
+  if (loading) return <p>Loading...</p>
+  return <h1>Completed</h1>
+}
+
+test('Loader should display loading completed message when loading is done', async () => {
+  render(<Loader />)
+
+  /* 
+  here we cannot .getByText('Loading completed') because <Loader/> behaves like this:
+  - it waits a second to set loading to false
+  - in the meantime while loading is true, "Loading..." is shown
+  - and then after 1 second loading is set to false and "Completed" is shown
+  so comment the line below and keep on to know how to handle this test case.
+  */
+  // expect(screen.getByText('Completed')).toBeInTheDocument()
+
+  /*
+  react-testing-library provides a useful API: waitFor. This is used in async cases like this, when you need to wait for an assertion to be true.
+  here we know that "Completed" will be shown by itself after 1 second. So just wait for the assertion that the element is in the DOM.
+  uncomment it and it finally works. Notice waitFor returns a promise so you need to await it.
+  */
+  await waitFor(() => expect(screen.getByText('Completed')).toBeInTheDocument())
+})
+```
+
+</details>
+
+<details>
+<summary>Exercises</summary>
+
+1. Use `<Loader/>` and test that: "render <Loader/> and show a loading message first and when loading is done, show “Loading completed” message".
+
+2. Same as exercise 1 but this time, this is after we click on the button “Skip loading” that 0.5 seconds later, the confirmation message is being shown.
+
+```tsx
+import * as React from 'react'
+import { render, screen, waitFor } from '@testing-library/react'
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+function LoaderWithSkip() {
+  const [isSkipped, setIsSkipped] = React.useState(false)
+  const [loading, setLoading] = React.useState(true)
+
+  const skipLoading = () => setIsSkipped(true)
+
+  React.useEffect(() => {
+    if (isSkipped) {
+      sleep(500).then(() => setLoading(false))
+    }
+  }, [isSkipped])
+
+  if (loading)
+    return (
+      <div>
+        <p>Loading...</p>
+        <button onClick={skipLoading}>Skip loading</button>
+      </div>
+    )
+  return <h1>Loading completed</h1>
+}
+
+test('render LoaderWithSkip, show a loading message and show completed message 0.5s after we click on skip loading button', () => {
+  render(<LoaderWithSkip />)
+})
+```
+
+3. Same as previous exercises but with a different behavior. Look at the useEffect and you can see that sleep.then() is immediately executed on mount and thus 0.5 seconds after the component mounts, loading is set to true and the message is being shown. So write the tests for this specific behavior.
+
+```tsx
+import * as React from 'react'
+import { render, screen, waitFor } from '@testing-library/react'
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+function LoaderWithSkip() {
+  const [isSkipped, setIsSkipped] = React.useState(false)
+  const [loading, setLoading] = React.useState(true)
+
+  const skipLoading = () => setIsSkipped(true)
+
+  React.useEffect(() => {
+    sleep(500).then(() => setLoading(false))
+  }, [isSkipped])
+
+  if (loading)
+    return (
+      <div>
+        <p>Loading...</p>
+        <button onClick={skipLoading}>Skip loading</button>
+      </div>
+    )
+
+  return <h1>Loading completed</h1>
+}
+
+test('should display Loading completed 0.5s after the component mounts', () => {
+  render(<LoaderWithSkip />)
+})
+```
+
+4. Here it's exactly the same as exercise 3 but we can abort the loading. Write the test for it.
+
+```tsx
+import * as React from 'react'
+import { render, screen, waitFor } from '@testing-library/react'
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+function LoaderWithAbortion() {
+  const [isAborted, setIsAborted] = React.useState(false)
+  const [loading, setLoading] = React.useState(true)
+
+  const abort = () => setIsAborted(true)
+
+  React.useEffect(() => {
+    sleep(2000).then(() => {
+      if (isAborted) {
+        return setLoading(true)
+      }
+      setLoading(false)
+    })
+  }, [isAborted])
+
+  if (isAborted) {
+    return <p>Aborted</p>
+  }
+  if (loading) {
+    return (
+      <div>
+        <p>Loading...</p>
+        <button onClick={abort}>Abort</button>
+      </div>
+    )
+  }
+  return <h1>Loading completed</h1>
+}
+
+test('should be able to abort the loading when we click on abort button within 2 seconds', () => {
+  render(<LoaderWithAbortion />)
+})
+```
+
+</details>
+
+<details>
+<summary>Go further</summary>
+
+- If you want to wait for disappearance use `waitForElementToBeRemoved`, it works exactly like `waitFor`. [https://testing-library.com/docs/guide-disappearance#waiting-for-disappearance](https://testing-library.com/docs/guide-disappearance#waiting-for-disappearance)
+</details>
