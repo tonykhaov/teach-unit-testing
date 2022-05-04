@@ -110,7 +110,7 @@ test('should not return the addition of the two numbers provided', () => {
 import { render, screen } from '@utils/test/app-test-utils'
 
 test('render HTML elements: a checkbox with a label', () => {
-  /* 
+  /*
   We first need to render the component. And luckily, react-testing-library provides the API for us: render().
   the argument of render() is gonna be displayed in the DOM just like document.body.innerHTML
   any jsx can be rendered: HTML tags & React Components.
@@ -121,7 +121,7 @@ test('render HTML elements: a checkbox with a label', () => {
       <label htmlFor="happy">Are you happy?</label>
     </div>
   )
-  /* 
+  /*
   screen.debug is a method provided by react-testing-library to console.log everything that is currently in the DOM!
   you will see a checkbox with its label in the "DOM" and all of their attributes!
   */
@@ -176,8 +176,8 @@ test('should render <Header/> with the title and the description', () => {
   You don't need jest-dom to be honest because you can write it like this:
   expect(title).not.toBeNull()
   But this way of writing your test is less readable and thus less maintainable.
-  
-  
+
+
   Another example of a less readable assertion:
   expect(title.textContent).toBe("Title of the header")
   but look at this one: expect(title).toHaveTextContent("Title of the header"), it is more readable.
@@ -334,7 +334,7 @@ test('should render a checkbox with any customised label', () => {
   */
   expect(checkbox).toBeInTheDocument()
 
-  /* 
+  /*
   // userEvent is another testing-library package that allows the test to interract with "DOM" elements
   // from the userEvent we want to click on something so we pass the element in the method .click()
   */
@@ -363,14 +363,15 @@ test('should render a checkbox with a default value of checked but still be able
 <details>
 <summary>Exercises</summary>
 
-1. Create an `<Input/>` component that will return these 2 elements: `<input type="text"/>` and `<label>Email address</label>`. Test that you can write any email (use faker) inside the input and make an assertion on it. Hint: use `.getByLabelText()` instead of .getByRole(”textbox”) because think of it as a user: you want to get the input that has the label text “Email address”.
+1. Create a `<Button/>` component, and test that when the user clicks on the button, that the button is focused.
+
+- Extra: Test that when the user hits `tab`, that the button is focused.
+
+2. Create an `<Input/>` component that will return these 2 elements: `<input type="text"/>` and `<label>Email address</label>`. Test that you can write any email (use faker) inside the input and make an assertion on it. Hint: use `.getByLabelText()` instead of .getByRole(”textbox”) because think of it as a user: you want to get the input that has the label text “Email address”.
 
 - Extra: I can now pass a defaultValue to `<Input/>` so cover this case.
 - Extra 2: Write a second test and this time this will test that I can choose the type of the input (this will be a type number) and assert that it works: you can type a number and also test that I cannot enter any text in the input.
-
-2. Create a `<Button/>` component, and test that when the user clicks on the button, that the button is focused.
-
-- Extra: Test that when the user hits `tab`, that the button is focused.
+- Extra 3: Test that when I click on the label, that the input is focused.
 
 3. Create a `<Form/>` component and test it. `<Form/>` will have these elements: input to enter the country, input to enter the age, radios between Mr. and Mrs. and a submit button.
 
