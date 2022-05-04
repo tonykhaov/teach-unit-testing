@@ -10,7 +10,7 @@ Hello this is my workshop to teach you how to learn unit testing (JS & React)
 - run `npm run test:watch`
 - from now on you can follow the workshop and you’ll just need to copy and paste the code examples in the `learn-unit-testing.test.tsx` file.
 
-## 1. How to test basic JS functions.
+### 1. How to test basic JS functions.
 
 <details>
 <summary>Lesson</summary>
@@ -95,7 +95,7 @@ test('should not return the addition of the two numbers provided', () => {
 
 </details>
 
-## 2. How to test a React Component. (render() + .toBeInTheDocument())
+### 2. How to test a React Component. (render() + .toBeInTheDocument())
 
 - **Jest**/**Vitest** are test runners, what execute tests. (We will be using vitest but it literally is the same, just that vitest is way faster than jest.)
 
@@ -304,7 +304,7 @@ test('should return a list of items: the exact number of items and their names s
 
 </details>
 
-## 3. How to interact with DOM elements (userEvent)
+### 3. How to interact with DOM elements (userEvent)
 
 <details>
 <summary>Lesson</summary>
@@ -381,4 +381,101 @@ test('should render a checkbox with a default value of checked but still be able
 <summary>Go further</summary>
 
 - fireEvent exists but you just need to use userEvent: [https://kentcdodds.com/blog/common-mistakes-with-react-testing-library#not-using-testing-libraryuser-event](https://kentcdodds.com/blog/common-mistakes-with-react-testing-library#not-using-testing-libraryuser-event)
+</details>
+
+### 4. How to test that elements are not in the DOM (queryBy)
+
+<details>
+<summary>Lesson</summary>
+
+```tsx
+import * as React from 'react'
+import { render, screen } from '@utils/test/app-test-utils'
+
+type StatusType = 'unread' | 'playing' | 'played'
+
+function Player() {
+  const [status, setStatus] = React.useState<StatusType>('unread')
+  return (
+    <>
+      <div>
+        <button onClick={() => setStatus('playing')}>Play</button>
+        <button onClick={() => setStatus('played')}>Done</button>
+        <button onClick={() => setStatus('unread')}>Reset</button>
+      </div>
+      <div>
+        {status === 'unread' ? <h1>Unread</h1> : null}
+        {status === 'playing' ? <h1>Playing</h1> : null}
+        {status === 'played' ? <h1>Played</h1> : null}
+      </div>
+    </>
+  )
+}
+
+test('render Player and should show only "unread" text when first mounted', () => {
+  render(<Player />)
+
+  /*
+  getByText throws an error if it cannot get the text that will cause the test fail and to not continuing.
+  Instead what you want to do is use queryByText which will just return null if it cannot select the element and the test can keep on.
+  */
+  expect(screen.getByText('Playing')).not.toBeInTheDocument()
+
+  /* UNCOMMENT THE LINE BELOW AND FIX ME */
+  // const playedMessage = ???
+  expect(playedMessage).not.toBeInTheDocument()
+
+  // now check that "unread" is displayed
+})
+```
+
+</details>
+
+<details>
+<summary>Exercises</summary>
+
+1. Reuse `<Player/>` but write test for this one
+
+```tsx
+  test('render Player and when clicked on “Play” button, should now only show “Playing” text and not show the other 2 messages', () => {
+
+  })
+```
+
+2. Reuse `<Player/>` but write test for this one
+
+```tsx
+  test('render Player and when clicked on “Done” button, should now only show “Played” text and not show the other 2 messages', () => {
+
+  })
+```
+
+3. Reuse `<Player/>` but write test for this one
+
+```tsx
+  test('render Player and should only display the right messages when we click on each button', () => {
+    // when I click on "Play"
+    // this/these thing(s) should be in the DOM
+    // this/these thing(s) should not be in the DOM
+
+    // when I click on "Done"
+    // this/these thing(s) should be in the DOM
+    // this/these thing(s) should not be in the DOM
+
+    // when I click on "Reset"
+    // this/these thing(s) should be in the DOM
+    // this/these thing(s) should not be in the DOM
+  })
+```
+
+4. Render any random message and assert that any element like a button with the text "Say hi" is not displayed in the DOM
+
+5. Render any random message and assert that any element like a label text with the content "Money money" is not displayed in the DOM
+
+</details>
+
+<details>
+<summary>Go further</summary>
+
+- We getBy to get an element that is in the DOM but we only use queryBy to test that an element is not in the DOM [https://kentcdodds.com/blog/common-mistakes-with-react-testing-library#using-query-variants-for-anything-except-checking-for-non-existence](https://kentcdodds.com/blog/common-mistakes-with-react-testing-library#using-query-variants-for-anything-except-checking-for-non-existence)
 </details>
