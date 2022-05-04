@@ -107,7 +107,7 @@ test('should not return the addition of the two numbers provided', () => {
 1. Arrange your test with .render()
 
 ```tsx
-import { render, screen } from '@utils/test/app-test-utils'
+import { render, screen } from '@testing-library/react'
 
 test('render HTML elements: a checkbox with a label', () => {
   /*
@@ -137,7 +137,7 @@ test('render HTML elements: a checkbox with a label', () => {
 2. Get elements with screen.getBy() and make assertions on them with .toBeInTheDocument()
 
 ```tsx
-import { render, screen } from '@utils/test/app-test-utils'
+import { render, screen } from '@testing-library/react'
 
 function Header() {
   return (
@@ -203,7 +203,7 @@ test('should render <Header/> with the title and the description', () => {
 2. Test that I can display any text content inside the `<Button/>` component
 
 ```tsx
-import { render, screen } from '@utils/test/app-test-utils'
+import { render, screen } from '@testing-library/react'
 
 function Button({ children }: React.PropsWithChildren<React.ReactNode>) {
   return <button>{children}</button>
@@ -223,7 +223,7 @@ test('should return a button and display any text I pass as a children', () => {
 4. Test `<List/>` component and with this component I can pass an array as a props that will be displayed individually
 
 ```tsx
-import { render, screen } from '@utils/test/app-test-utils'
+import { render, screen } from '@testing-library/react'
 import { faker } from '@faker-js/faker'
 
 type Item = {
@@ -310,7 +310,8 @@ test('should return a list of items: the exact number of items and their names s
 <summary>Lesson</summary>
 
 ```tsx
-import { render, screen } from '@utils/test/app-test-utils'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 type CheckboxProps = {
   label: string
@@ -390,7 +391,7 @@ test('should render a checkbox with a default value of checked but still be able
 
 ```tsx
 import * as React from 'react'
-import { render, screen } from '@utils/test/app-test-utils'
+import { render, screen } from '@testing-library/react'
 
 type StatusType = 'unread' | 'playing' | 'played'
 
@@ -437,35 +438,29 @@ test('render Player and should show only "unread" text when first mounted', () =
 1. Reuse `<Player/>` but write test for this one
 
 ```tsx
-  test('render Player and when clicked on “Play” button, should now only show “Playing” text and not show the other 2 messages', () => {
-
-  })
+test('render Player and when clicked on “Play” button, should now only show “Playing” text and not show the other 2 messages', () => {})
 ```
 
 2. Reuse `<Player/>` but write test for this one
 
 ```tsx
-  test('render Player and when clicked on “Done” button, should now only show “Played” text and not show the other 2 messages', () => {
-
-  })
+test('render Player and when clicked on “Done” button, should now only show “Played” text and not show the other 2 messages', () => {})
 ```
 
 3. Reuse `<Player/>` but write test for this one
 
 ```tsx
-  test('render Player and should only display the right messages when we click on each button', () => {
-    // when I click on "Play"
-    // this/these thing(s) should be in the DOM
-    // this/these thing(s) should not be in the DOM
-
-    // when I click on "Done"
-    // this/these thing(s) should be in the DOM
-    // this/these thing(s) should not be in the DOM
-
-    // when I click on "Reset"
-    // this/these thing(s) should be in the DOM
-    // this/these thing(s) should not be in the DOM
-  })
+test('render Player and should only display the right messages when we click on each button', () => {
+  // when I click on "Play"
+  // this/these thing(s) should be in the DOM
+  // this/these thing(s) should not be in the DOM
+  // when I click on "Done"
+  // this/these thing(s) should be in the DOM
+  // this/these thing(s) should not be in the DOM
+  // when I click on "Reset"
+  // this/these thing(s) should be in the DOM
+  // this/these thing(s) should not be in the DOM
+})
 ```
 
 4. Render any random message and assert that any element like a button with the text "Say hi" is not displayed in the DOM
