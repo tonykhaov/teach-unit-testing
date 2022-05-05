@@ -644,3 +644,239 @@ test('should be able to abort the loading when we click on abort button within 2
 
 - If you want to wait for disappearance use `waitForElementToBeRemoved`, it works exactly like `waitFor`. [https://testing-library.com/docs/guide-disappearance#waiting-for-disappearance](https://testing-library.com/docs/guide-disappearance#waiting-for-disappearance)
 </details>
+
+### 6. How to test when my Component communicate with the backend (mock it with msw)
+
+</p>
+<details>
+
+<summary>Lesson</summary>
+<p>Unit tests and integration tests must never depend on the real backend. Only E2E tests should. *Find reason.*</p>
+<p>
+<p>
+<a href="https://github.com/mswjs/msw#usage-example">
+MSW</a> is a JS library that can be used client side (in the browser) but also server side along with jest/vitest. For the tests we are going to use it server side. MSW will set up a server that will create endpoints (request handlers).
+</p>
+<p>MSW will act as a middleman. Meaning that your network call is will go to the real backend but msw will intercept it and return the response without your network call having to go to the real backend. You can then control what response to return etc.
+</p>
+
+```tsx
+import { render, screen, waitForElementToBeRemoved } from '@testing-library/react'
+import { rest } from 'msw'
+import { setupServer } from 'msw/node'
+import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
+
+// we first need to set up the mock server to intercept every requests made by components
+const mockServer = setupServer()
+
+// We set up this QueryProvider become we're gonna use react-query
+const QueryProvider = ({ children }: { children: React.ReactElement }) => {
+  const client = new QueryClient()
+  return <QueryClientProvider client={client}>{children}</QueryClientProvider>
+}
+
+// We create this custom render because we want to avoid using the default render and passing properties to it. It's just for a better UX
+// instead we would have this every time: render(<QueryProvider><Component /></QueryProvider>)
+// now it's just this call: customRender(<Component />)
+const customRender = (ui: React.ReactElement) => render(ui, { wrapper: QueryProvider })
+
+type Article = {
+  title: string
+  description: string
+  date: string
+  author: string
+}
+const backendApi = 'https://mybackend.com/api/top-article'
+
+function ReadTopArticle() {
+  // I'm using react-query because it's easier but it works with a simple fetch + useEffect. Don't mind this setup.
+  const { status, data } = useQuery<Article>({
+    queryKey: 'top-article',
+    queryFn: () => fetch(backendApi).then((res) => res.json()),
+  })
+
+  if (status === 'loading') return <p>Loading...</p>
+  if (status === 'success') {
+    return (
+      <div>
+        <h1>{data.title}</h1>
+        <p>{data.date}</p>
+        <p>{data.description}</p>
+        <p>{data.author}</p>
+      </div>
+    )
+  }
+  return null
+}
+
+// before the test is run we must start the server.
+beforeAll(() => mockServer.listen())
+
+// after each test we must clean up the interceptors.
+afterEach(() => mockServer.resetHandlers())
+
+// after all tests are done we must close the server to avoid memory leak and conflict we other tests.
+afterAll(() => mockServer.close())
+
+test('render ReadTopArticle that fetches the backend and display the article with the right data sent by the backend', async () => {
+  // I'd use faker to generate a random article but this is not the goal of this learning module.
+  const dataSentByBackend = {
+    title: 'Macron is reelected!!',
+    description:
+      'After a fight between Zemmour and Macron, Macron finally KOed his opponent with a powerful punch',
+    date: '2022-05-10',
+    author: 'Melenchon',
+  }
+
+  // mockServer.use is a middleware that intercepts all requests and returns the data sent by the backend.
+  mockServer.use(
+    // le backend va return un truc qui a cette gueule
+    // you pass this rest.get() with the url you want to intercept and the data you want to return.
+    rest.get(backendApi, (req, res, ctx) => {
+      return res(ctx.json(dataSentByBackend))
+    })
+  )
+
+  customRender(<ReadTopArticle />)
+
+  // The component is getting the data so Loading... is displayed. You can verify by uncommenting screen.debug()
+  // screen.debug()
+
+  await waitForElementToBeRemoved(() => screen.getByText('Loading...'))
+  // We have waited for Loading... to be removed so it means the data is fetched and displayed. You can verify by uncommenting screen.debug()
+  // screen.debug()
+
+  /* 
+  And now we can make our assertions about our dataSentByBackend.
+  Assert that:
+  - the title is the same as the one sent by the backend
+  - the description is the same as the one sent by the backend
+  - the date is the same as the one sent by the backend
+  - the author is the same as the one sent by the backend
+  */
+})
+```
+
+</details>
+
+<details>
+<summary>Exercises</summary>
+
+1. Use this `<User/>` component that will fetch the backend and create a request handler with msw to mock the return of the server to return user data.
+
+```tsx
+import { render, screen, waitForElementToBeRemoved } from '@testing-library/react'
+import { rest } from 'msw'
+import { setupServer } from 'msw/node'
+import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
+
+const mockServer = setupServer()
+beforeAll(() => mockServer.listen())
+afterEach(() => mockServer.resetHandlers())
+afterAll(() => mockServer.close())
+
+const QueryProvider = ({ children }: { children: React.ReactElement }) => {
+  const client = new QueryClient()
+  return <QueryClientProvider client={client}>{children}</QueryClientProvider>
+}
+
+const customRender = (ui: React.ReactElement) => render(ui, { wrapper: QueryProvider })
+
+type User = {
+  name: string
+  age: number
+  url: string
+  bio: string
+}
+const backendApi = 'https://mybackend.com/api/user'
+
+function User() {
+  const { status, data } = useQuery<User>({
+    queryKey: 'user',
+    queryFn: () => fetch(backendApi).then((res) => res.json()),
+  })
+
+  if (status === 'loading') return <p>Loading...</p>
+  if (status === 'success') {
+    return (
+      <div>
+        <h1>{data.name}</h1>
+        <p>{data.age}</p>
+        <p>{data.url}</p>
+        <p>{data.bio}</p>
+      </div>
+    )
+  }
+  return null
+}
+
+test('render ReadTopArticle that fetches the backend and display the article with the right data sent by the backend', async () => {
+  customRender(<Users />)
+})
+```
+
+2. Handle an error. Use the code snippet below with a new component that handles errors. I want you to cover another edge case, when the backend sends an error.
+
+```tsx
+import { render, screen, waitForElementToBeRemoved } from '@testing-library/react'
+import { rest } from 'msw'
+import { setupServer } from 'msw/node'
+import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
+
+const mockServer = setupServer()
+beforeAll(() => mockServer.listen())
+afterEach(() => mockServer.resetHandlers())
+afterAll(() => mockServer.close())
+
+const QueryProvider = ({ children }: { children: React.ReactElement }) => {
+  const client = new QueryClient()
+  return <QueryClientProvider client={client}>{children}</QueryClientProvider>
+}
+
+const customRender = (ui: React.ReactElement) => render(ui, { wrapper: QueryProvider })
+
+type Blah = {
+  name: string
+  age: number
+  url: string
+  bio: string
+}
+const backendApi = 'https://mybackend.com/api/user'
+
+function User() {
+  const { status, data, error } = useQuery<User>({
+    queryKey: 'user',
+    queryFn: () => fetch(backendApi).then((res) => res.json()),
+  })
+
+  if (status === 'error') return <p>{error}</p>
+  if (status === 'loading') return <p>Loading...</p>
+  if (status === 'success') {
+    return (
+      <div>
+        <h1>{data.name}</h1>
+        <p>{data.age}</p>
+        <p>{data.url}</p>
+        <p>{data.bio}</p>
+      </div>
+    )
+  }
+  return null
+}
+
+test('render ReadTopArticle that fetches the backend and display the article with the right data sent by the backend', async () => {
+  customRender(<Users />)
+})
+```
+
+</details>
+<details>
+<summary>Go further</summary>
+
+- Because creating a server on every test files and listening to the server beforeAll and cleaning up afterEach is tedious, you want to call the server in a separate file, handle the server in `setupFiles.ts` and only import `server` from the separate file. Look at `setupFiles.ts` and `server.ts` for an example.
+
+- [https://mswjs.io/docs/api/response](https://mswjs.io/docs/api/response)
+
+- [https://mswjs.io/docs/api/context/json](https://mswjs.io/docs/api/context/json)
+
+</details>
