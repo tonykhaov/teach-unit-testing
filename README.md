@@ -304,14 +304,13 @@ test('should return a list of items: the exact number of items and their names s
 
 </details>
 
-### 3. How to interact with DOM elements (userEvent)
+### 3. How to interact with DOM elements (fireEvent)
 
 <details>
 <summary>Lesson</summary>
 
 ```tsx
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { render, screen, fireEvent } from '@testing-library/react'
 
 type CheckboxProps = {
   label: string
@@ -331,16 +330,16 @@ test('should render a checkbox with any customised label', () => {
 
   /*
   use .getByLabelText() instead of .getByRole('checkbox') because think like a user.
-  The user won't select any random checkbox, it will select the input (checkbox) that has the label text he wants.
+  The user won't select any random checkbox, it will select the input (checkbox) with the label text he wants.
   */
   expect(checkbox).toBeInTheDocument()
 
   /*
-  // userEvent is another testing-library package that allows the test to interract with "DOM" elements
-  // from the userEvent we want to click on something so we pass the element in the method .click()
+  // react-testing-library export fireEvent that allows the test to interract with "DOM" elements
+  // from the fireEvent we want to click on something so we pass the element in the method .click()
   */
   // UNCOMMENT THE LINE BELOW
-  // userEvent.click(checkbox)
+  // fireEvent.click(checkbox)
 
   /*
   now that we have clicked on the checkbox, we need to make an assertion
@@ -364,24 +363,15 @@ test('should render a checkbox with a default value of checked but still be able
 <details>
 <summary>Exercises</summary>
 
-1. Create a `<Button/>` component, and test that when the user clicks on the button, that the button is focused.
-
-- Extra: Test that when the user hits `tab`, that the button is focused.
+1. Create a `<Button/>` component that will return a button and click on the button. You don't need to make any assertion it's just for you to practice.
 
 2. Create an `<Input/>` component that will return these 2 elements: `<input type="text"/>` and `<label>Email address</label>`. Test that you can write any email (use faker) inside the input and make an assertion on it. Hint: use `.getByLabelText()` instead of .getByRole(”textbox”) because think of it as a user: you want to get the input that has the label text “Email address”.
 
 - Extra: I can now pass a defaultValue to `<Input/>` so cover this case.
 - Extra 2: Write a second test and this time this will test that I can choose the type of the input (this will be a type number) and assert that it works: you can type a number and also test that I cannot enter any text in the input.
-- Extra 3: Test that when I click on the label, that the input is focused.
 
 3. Create a `<Form/>` component and test it. `<Form/>` will have these elements: input to enter the country, input to enter the age, radios between Mr. and Mrs. and a submit button.
 
-</details>
-
-<details>
-<summary>Go further</summary>
-
-- fireEvent exists but you just need to use userEvent: [https://kentcdodds.com/blog/common-mistakes-with-react-testing-library#not-using-testing-libraryuser-event](https://kentcdodds.com/blog/common-mistakes-with-react-testing-library#not-using-testing-libraryuser-event)
 </details>
 
 ### 4. How to test that elements are not in the DOM (queryBy)
