@@ -870,3 +870,71 @@ test('render ReadTopArticle that fetches the backend and display the article wit
 - [https://mswjs.io/docs/api/context/json](https://mswjs.io/docs/api/context/json)
 
 </details>
+
+### 7. Mock functions (vi.fn())
+
+<details>
+<summary>Lesson</summary>
+
+Mock functions are useful when you want to test an implementation. Let's say for example you have created your own react-query library and you want to make sur that your function is called (1 time, 2 times, 3 times) after the fetch call is made. Well you'd want to use mock functions (vi.fn()). It's a function you create and every time you call it it stores it and you can make assertions based on the number of time the mock function has been called for example.
+
+```tsx
+import { render } from '@testing-library/react'
+
+type ButtonProps = {
+  children: React.ReactNode
+  onClick: () => void
+}
+function Button({ children, onClick }: ButtonProps) {
+  return <button onClick={onClick}>{children}</button>
+}
+
+test('should call the function onClick when we click on the button', () => {
+  // we first create a mock function with vi.fn() and store it in `mockOnClick`
+  const mockOnClick = vi.fn()
+
+  render(<Button onClick={mockOnClick}>button</Button>)
+
+  // we haven't clicked on the button so mockOnClick is not called yet
+  expect(mockOnClick).not.toHaveBeenCalled()
+
+  // click on the button
+
+  // assert that the function mockOnClick has been called
+
+  // if you console.log(mockOnClick), you can see properties in the function.
+  // vitest/jest will store informations so that you can assert on the mocked functions
+  // expect(?).to?
+})
+
+test('mockOnClick should be called 3 times if we click on the button 3 times', () => {
+  // arrange the test
+  // act
+  // make your assertion
+  // for your information when you mock a function, it counts the number of time it has been called.
+  // expect().toHaveBeenCalledTimes(2) // we assert that the mock function was called two times
+})
+```
+
+</details>
+
+<details>
+<summary>Exercises</summary>
+
+1. Crée un composant `<Input />` où tu peux lui passer en props un onChange. Lorsque tu testeras le composant, tu lui passeras un mock function et tu testeras que le mock function a bien été appelé.
+
+2. Réutilise `<Input />` et cette fois ci utilise `.toHaveBeenCalledTimes()`
+
+</details>
+<details>
+<summary>Go further</summary>
+
+- [https://vitest.dev/api/#vi-fn](https://vitest.dev/api/#vi-fn)
+
+- [https://jestjs.io/fr/docs/mock-function-api#jestfnimplementation](https://jestjs.io/fr/docs/mock-function-api#jestfnimplementation)
+
+- jest.fn() et vi.fn() sont pareils juste que l’un fonctionne avec jest et l’autre avec vitest mais c’est la même utilisation (car vitest s’est inspiré de jest).
+
+- [https://vitest.dev/api/#tohavebeencalledwith](https://vitest.dev/api/#tohavebeencalledwith)
+
+</details>
