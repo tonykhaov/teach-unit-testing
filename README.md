@@ -16,6 +16,7 @@ Hello this is my workshop to teach you how to learn unit testing (JS & React)
 <summary>Lesson</summary>
 
 ```tsx
+import 'react'
 // add() is the function we want to test
 function add(a: number, b: number) {
   return a + b
@@ -95,7 +96,71 @@ test('should not return the addition of the two numbers provided', () => {
 
 </details>
 
-### 2. How to test a React Component. (render() + .toBeInTheDocument())
+### 2. Set up your test with (beforeAll, beforeEach, afterEach, afterAll)
+
+<details>
+<summary>Lesson</summary>
+
+```tsx
+import 'react'
+
+// Uncomment me
+// beforeAll(() => {
+//   console.log(
+//     `#beforeAll this is run only once, just before the tests start. It's normal if you see it printed out at the end of the tests, everything in beforeAll is run before beforeEach`
+//   )
+// })
+
+// Uncomment me
+// beforeEach(() => {
+//   console.log(
+//     `@beforeEach this is run before every test. You should see this message printed out just before #afterEach message`
+//   )
+// })
+
+// Uncomment me
+// afterEach(() => {
+//   console.log(
+//     `%afterEach this is run after every test. You should see this message printed out just after #beforeEach message`
+//   )
+// })
+
+// Uncomment me
+// afterAll(() => {
+//   console.log(
+//     `&afterAll this is run only once, after the tests are done. You should see this message printed out last`
+//   )
+// })
+
+test('test #1', () => {
+  expect(true).toBe(true)
+  console.log('^test1 this is the first test!')
+})
+
+test('test #2', () => {
+  expect(true).toBe(true)
+})
+
+test('test #3', () => {
+  expect(true).toBe(true)
+})
+
+test('test #4', () => {
+  expect(true).toBe(true)
+  console.log('^test4 this is the last test!')
+})
+```
+
+</details>
+
+<details>
+<summary>Go further</summary>
+
+You will almost never need to use them. But you can take a look at the 7th module about msw. In the lesson you'll see beforeAll, afterAll, etc. They are needed because we run a server during our test and we want to run it before the tests start and shut it after the tests pass.
+
+</details>
+
+### 3. How to test a React Component. (render() + .toBeInTheDocument())
 
 - **Jest**/**Vitest** are test runners, what execute tests. (We will be using vitest but it literally is the same, just that vitest is way faster than jest.)
 
@@ -304,7 +369,7 @@ test('should return a list of items: the exact number of items and their names s
 
 </details>
 
-### 3. How to interact with DOM elements (fireEvent)
+### 4. How to interact with DOM elements (fireEvent)
 
 <details>
 <summary>Lesson</summary>
@@ -374,7 +439,7 @@ test('should render a checkbox with a default value of checked but still be able
 
 </details>
 
-### 4. How to test that elements are not in the DOM (queryBy)
+### 5. How to test that elements are not in the DOM (queryBy)
 
 <details>
 <summary>Lesson</summary>
@@ -465,7 +530,7 @@ test('render Player and should only display the right messages when we click on 
 - We getBy to get an element that is in the DOM but we only use queryBy to test that an element is not in the DOM [https://kentcdodds.com/blog/common-mistakes-with-react-testing-library#using-query-variants-for-anything-except-checking-for-non-existence](https://kentcdodds.com/blog/common-mistakes-with-react-testing-library#using-query-variants-for-anything-except-checking-for-non-existence)
 </details>
 
-### 5. How to handle async events happening in the DOM (waitFor)
+### 6. How to handle async events happening in the DOM (waitFor)
 
 <details>
 <summary>Lesson</summary>
@@ -635,7 +700,7 @@ test('should be able to abort the loading when we click on abort button within 2
 - If you want to wait for disappearance use `waitForElementToBeRemoved`, it works exactly like `waitFor`. [https://testing-library.com/docs/guide-disappearance#waiting-for-disappearance](https://testing-library.com/docs/guide-disappearance#waiting-for-disappearance)
 </details>
 
-### 6. How to test when my Component communicate with the backend (mock it with msw)
+### 7. How to test when my Component communicate with the backend (mock it with msw)
 
 </p>
 <details>
@@ -705,7 +770,7 @@ beforeAll(() => mockServer.listen())
 // after each test we must clean up the interceptors.
 afterEach(() => mockServer.resetHandlers())
 
-// after all tests are done we must close the server to avoid memory leak and conflict we other tests.
+// after all tests are done we must close the server to avoid memory leak and conflict with other tests.
 afterAll(() => mockServer.close())
 
 test('render ReadTopArticle that fetches the backend and display the article with the right data sent by the backend', async () => {
@@ -871,7 +936,7 @@ test('render ReadTopArticle that fetches the backend and display the article wit
 
 </details>
 
-### 7. Mock functions (vi.fn())
+### 8. Mock functions (vi.fn())
 
 <details>
 <summary>Lesson</summary>
