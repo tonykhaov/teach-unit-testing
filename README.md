@@ -1071,3 +1071,79 @@ test('should get the message after 1s and be able to toggle its message', async 
 
 </details>
 
+<details>
+<summary>Exercises</summary>
+
+```tsx
+import * as React from 'react'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+
+const user = userEvent.setup()
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+type StatusType = 'unread' | 'playing' | 'played'
+
+function Player() {
+  const [status, setStatus] = React.useState<StatusType>('unread')
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [shouldDisplay, setShouldDisplay] = React.useState(false)
+
+  React.useEffect(() => {
+    sleep(1000).then(() => setShouldDisplay(true))
+  }, [])
+
+  const updateStatus = async (newStatus: StatusType) => {
+    if (!shouldDisplay) {
+      setShouldDisplay(true)
+    }
+    setIsLoading(true)
+    // we're gonna wait 1 second before the new status is set.
+    await sleep(1000)
+
+    setStatus(newStatus)
+    setIsLoading(false)
+  }
+  return (
+    <>
+      <div>
+        <button onClick={() => updateStatus('playing')}>Play</button>
+        <button onClick={() => updateStatus('played')}>Done</button>
+        <button onClick={() => updateStatus('unread')}>Reset</button>
+      </div>
+      {shouldDisplay && (
+        <p>
+          {isLoading ? 'Loading...' : null}
+
+          {status === 'unread' && !isLoading ? 'Unread' : null}
+          {status === 'playing' && !isLoading ? 'Playing' : null}
+          {status === 'played' && !isLoading ? 'Played' : null}
+        </p>
+      )}
+    </>
+  )
+}
+
+test('render Player and should show only "unread" text when first mounted', async () => {
+  render(<Player />)
+
+  const buttons = {
+    play: screen.getByRole('button', { name: /play/i }),
+    done: screen.getByRole('button', { name: /done/i }),
+    reset: screen.getByRole('button', { name: /reset/i }),
+  }
+  await user.click(buttons.play)
+  const message = await screen.findByText(/playing/i)
+
+  await user.click(buttons.reset)
+  // assert that it should display loading first
+  // then assert that should display unread
+
+  await user.click(buttons.done)
+  // assert that it should display loading first
+  // then assert that it should display played
+})
+```
+
+</details>
