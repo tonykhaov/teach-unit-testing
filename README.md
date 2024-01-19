@@ -1003,3 +1003,71 @@ test('mockOnClick should be called 3 times if we click on the button 3 times', (
 - [https://vitest.dev/api/#tohavebeencalledwith](https://vitest.dev/api/#tohavebeencalledwith)
 
 </details>
+
+### 9. findBy (vs. waitFor)
+
+<details>
+<summary>Lesson</summary>
+
+findBy est un selector comme getBy ou queryBy. Sauf que dans ton test cet élèment n’est pas encore dans le DOM pour que tu puisses faire un getBy (si tu fais getBy, ca te retournerait une erreur car il n’est pas encore dans le DOM). Tu t’attends à ce que l’élèment apparaisse dans le DOM sous peu.
+
+Mais dans ce cas là, pourquoi utiliser screen.findBy alors qu'on a vu waitFor ?
+
+C’est simple, les 2 attendent qu’un élèment apparaisse dans le DOM mais findBy permet de stocker la variable. Donc si tu veux stocker cet element dans une variable et par exemple plus tard dans le test assert que cet element findBy aie un autre comportement par exemple, toHaveTextContent ou du genre.
+
+```tsx
+import * as React from 'react'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+
+// je t'ai appris fireEvent mais userEvent simule un comportement plus réaliste d'un utilisateur (pour le click, il va mettre sa souris dessus, cliquer, relacher la souris etc.)
+// https://testing-library.com/docs/user-event/intro/#differences-from-fireevent
+const user = userEvent.setup()
+
+function MessageWillPopUpAfterOneSecond(): React.ReactNode {
+  const [message, setMessage] = React.useState<string | null>(null)
+  const [toggle, setToggle] = React.useState(true)
+
+  React.useEffect(() => {
+    setTimeout(() => {
+      setMessage('MESSAGE')
+    }, 1000)
+  }, [])
+
+  return (
+    <>
+      <p>{toggle ? 'blue' : 'green'}</p>
+      <button onClick={() => setToggle((t) => !t)}>Toggle the content of the message</button>
+      {message && <p>{message}</p>}
+    </>
+  )
+}
+
+test('should get the message after 1s and be able to toggle its message', async () => {
+  render(<MessageWillPopUpAfterOneSecond />)
+
+  // if you remember the 5th module with waitFor, using getByText will throw an error here.
+  // const message = screen.getByText(/message/i)
+
+  // we could use waitFor: await waitFor(() => expect(screen.getByText(/blue/i)).toBeInTheDocument())
+  // but we wouldn't be able to store the DOM element `<p>blue</p>` in a variable to assert on it later
+  // so instead we're gonna use screen.findBy
+  const message = await screen.findByText(/blue/i)
+  // we store its current textContent in a variable to use it later to compare with its new textContent
+  const initialMessageTextContent = message.textContent
+
+  if (!initialMessageTextContent) throw new Error('message is null')
+
+  // click on the button so that it will toggle the content of the message
+  // await user.
+
+  // now we're gonna assert that the message's textContent is not the same as its initial textContent
+  // because that's the behavior of the component.
+  expect(message).not.toHaveTextContent(initialMessageTextContent)
+
+  // keep the previous expect and be more specfici, write another expect to assert that the text of message is the one we want.
+})
+```
+
+</details>
+
