@@ -317,7 +317,7 @@ And also another benefit of generating random data is that it gives me confidenc
 function generateItem(): Item {
   return {
     id: faker.datatype.uuid(),
-    name: faker.name.findName(),
+    name: faker.name.fullName(),
   }
 }
 
