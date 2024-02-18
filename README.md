@@ -270,7 +270,7 @@ test('should render <Header/> with the title and the description', () => {
 ```tsx
 import { render, screen } from '@testing-library/react'
 
-function Button({ children }: React.PropsWithChildren<React.ReactNode>) {
+function Button({ children }: { children: React.ReactNode }) {
   return <button>{children}</button>
 }
 
